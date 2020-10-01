@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-
+import GoogleMapDropin from "./GoogleMapDropin";
 import { Chart } from "react-google-charts";
 
 
@@ -50,26 +50,43 @@ function GoogleMap ({ province, newData }) {
         setMyData(temp)
 
     }, [province]);
+    
+    let isoRegionCode = newData[i][0];
+            if (mapType === 'test-strike') {
+                // v: Tooltip text, f: ISO region code
+                temp.push([
+                    {
+                        v: translate[isoRegionCode],
+                        f: isoRegionCode
+                    },
+                    parseFloat(value),
+                    "Test Positive Rate: " + parseFloat(value) + '%'
+                ]);
+            } else {
+                temp.push([
+                    {
+                        v: translate[isoRegionCode],
+                        f: isoRegionCode
+                    },
+                    parseFloat(value)
+                ]);
+            }
+        }
 
-    // const getOption = () => {
-  //   return {
-  //     visualMap: {
-  //       show: true,
-  //       type: 'piecewise',
-  //       min: 0,
-  //       max: 2000,
-  //       align: 'right',
-  //       top: province ? 0 : '40%',
-  //       right: 0,
-  //       left: province ? 0 : 'auto',
-  //       inRange: {
-  //         color: [
-  //           '#ffc0b1',
-  //           '#ff8c71',
-  //           '#ef1717',
-  //           '#9c0505'
-  //         ]
-  //       },
+        setMyData(temp)
+
+    }, [province, mapType]);
+
+   const getOption = () => {
+        return {
+            region: 'AU', // ISO 3166-1 alpha-2 code for Australia
+            colorAxis: { colors: mapGradient },
+            backgroundColor: 'white',
+            datalessRegionColor: 'rgb(216,221,224)',
+            defaultColor: '#f5f5f5',
+            resolution: 'provinces'
+        }
+    };
   //       pieces: [
   //         {min: 1000},
   //         {min: 500, max: 999},
@@ -156,25 +173,23 @@ function GoogleMap ({ province, newData }) {
       }
   };
 
-
-  return (
-    loading ? <div className="loading">Loading...</div> :
-        <Chart
-            width= {window.innerWidth < 960?'100%':'auto'}
-            left="auto"
-            align="right"
-            top="40%"
-            // width={'500px'}
-            // height={'300px'}
-            chartType="GeoChart"
-            data={myData}
-            options={getOption()}
-            // Note: you will need to get a mapsApiKey for your project.
-            // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
-            mapsApiKey="YOUR_KEY_HERE"
-            rootProps={{ 'data-testid': '3' }}
-        />
-  )
+  
+    <GoogleMapDropin
+                    width={window.innerWidth < 960 ? '100%' : 'auto'}
+                    height="28vh"
+                    left="auto"
+                    align="right"
+                    top="40%"
+                    chartType="GeoChart"
+                    data={myData}
+                    options={getOption()}
+                    // Note: you will need to get a mapsApiKey for your project.
+                    // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
+                    mapsApiKey="YOUR_KEY_HERE"
+                    rootProps={{ 'data-testid': '3' }}
+                />
+            </div>
+  
 }
-
 export default GoogleMap
+
